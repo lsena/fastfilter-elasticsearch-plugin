@@ -1,0 +1,59 @@
+/*
+ * Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+ * or more contributor license agreements. Licensed under the Elastic License
+ * 2.0 and the Server Side Public License, v 1; you may not use this file except
+ * in compliance with, at your election, the Elastic License 2.0 or the Server
+ * Side Public License, v 1.
+ */
+
+buildscript {
+
+  repositories {
+    mavenCentral()
+    jcenter()
+  }
+  
+  dependencies {
+    classpath "org.elasticsearch.gradle:build-tools:7.12.0"
+  }
+}
+
+apply plugin: "elasticsearch.esplugin"
+apply plugin: 'elasticsearch.yaml-rest-test'
+
+restResources {
+  restTests {
+    includeCore '*'
+  }
+}
+
+
+esplugin {
+  name "fastfilter-elasticsearch-plugin"
+  description "An example script plugin to use roaringbitmap for filtering"
+  classname "org.elasticsearch.lsena.fastfilter.FastFilterPlugin"
+  licenseFile rootProject.file("LICENSE.txt")
+  noticeFile rootProject.file("NOTICE.txt")
+
+}
+
+allprojects {
+    repositories {
+      mavenCentral()
+    }
+}
+
+dependencies {
+	implementation 'org.roaringbitmap:RoaringBitmap:0.9.10'
+
+  yamlRestTestImplementation "org.apache.logging.log4j:log4j-core:2.11.1"
+}
+
+// Set target compatibility
+sourceCompatibility = 11
+targetCompatibility = 11
+
+// loggerUsageCheck.enabled = false
+// testingConventions.enabled = false
+// thirdPartyAudit.enabled = false
+validateNebulaPom.enabled = false

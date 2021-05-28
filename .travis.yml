@@ -1,0 +1,16 @@
+sudo: false
+
+language: java
+
+jdk:
+  - openjdk11
+
+cache:
+  directories:
+    - $HOME/.m2/repository
+
+before_script:
+  - java -version
+
+script:
+  - gradle ':yamlRestTest' --tests "org.elasticsearch.lsena.fastfilter.FastFilterClientYamlTestSuiteIT.test {yaml=fastfilter/*}"

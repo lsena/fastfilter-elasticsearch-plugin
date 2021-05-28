@@ -1,0 +1,94 @@
+# Integration tests for the expert scoring script example plugin
+#
+---
+setup:
+  - do:
+      indices.create:
+          index:  test
+
+  - do:
+      index:
+        index:  test
+        id:     10
+        body:   { "important_field": "foo", "filter_id": 10 }
+  - do:
+        index:
+          index:  test
+          id:     20
+          body:   { "important_field": "foo foo foo", "filter_id": 20 }
+  - do:
+        index:
+          index:  test
+          id:     40
+          body:   { "important_field": "foo foo", "filter_id": 40 }
+
+  - do:
+      indices.refresh: {}
+---
+"document filtering exclude":
+  - do:
+      search:
+        rest_total_hits_as_int: true
+        index: test
+        body:
+          query:
+            function_score:
+              min_score: 0.00001
+              query:
+                match:
+                  important_field: "foo"
+              functions:
+                - script_score:
+                    script:
+                      source: "fast_filter"
+                      lang: "fast_filter"
+                      params:
+                        operation: "exclude"
+                        field: "filter_id"
+                        terms: "OjAAAAEAAAAAAAIAEAAAAAoAFAAjAA=="
+
+  - length: { hits.hits: 1 }
+  - match: {hits.hits.0._id: "40" }
+---
+"document filtering include":
+  - do:
+      search:
+        rest_total_hits_as_int: true
+        index: test
+        body:
+          query:
+            function_score:
+              min_score: 0.00001
+              query:
+                match:
+                  important_field: "foo"
+              functions:
+                - script_score:
+                    script:
+                      source: "fast_filter"
+                      lang: "fast_filter"
+                      params:
+                        operation: "include"
+                        field: "filter_id"
+                        terms: "OjAAAAEAAAAAAAIAEAAAAAoAFAAjAA=="
+
+  - length: { hits.hits: 2 }
+  - match: {hits.hits.0._id: "20" }
+  - match: {hits.hits.1._id: "10" }
+---
+"document filtering without script":
+  - do:
+      search:
+        rest_total_hits_as_int: true
+        index: test
+        body:
+          query:
+            function_score:
+              query:
+                match:
+                  important_field: "foo"
+
+  - length: { hits.hits: 3 }
+  - match: {hits.hits.0._id: "20" }
+  - match: {hits.hits.1._id: "40" }
+  - match: {hits.hits.2._id: "10" }

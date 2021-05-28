@@ -1,0 +1,5 @@
+fastfilter-elasticsearch-plugin
+Copyright 2013-2021 Luis Sena
+
+This product includes software developed by The Apache Software
+Foundation (http://www.apache.org/).
