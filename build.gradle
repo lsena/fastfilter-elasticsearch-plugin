@@ -7,31 +7,30 @@
  */
 
 buildscript {
-
+  ext {
+    es_version = version.replaceAll(/\.[0-9]+$/, "")
+  }
   repositories {
     mavenCentral()
     jcenter()
   }
   
   dependencies {
-    classpath "org.elasticsearch.gradle:build-tools:7.10.1"
+    classpath "org.elasticsearch.gradle:build-tools:${es_version}"
   }
 }
 
 apply plugin: "elasticsearch.esplugin"
 apply plugin: 'elasticsearch.yaml-rest-test'
 
-restResources {
-  restTests {
-    includeCore '*'
-  }
+tasks.withType(JavaCompile) {
+    options.compilerArgs << "-Xlint:unchecked,deprecation"
 }
 
-
 esplugin {
-  name "fastfilter-elasticsearch-plugin"
-  description "An example script plugin to use roaringbitmap for filtering"
-  classname "org.elasticsearch.lsena.fastfilter.FastFilterPlugin"
+  name pluginName
+  description pluginDescription
+  classname pluginClassname
   licenseFile rootProject.file("LICENSE.txt")
   noticeFile rootProject.file("NOTICE.txt")
 
