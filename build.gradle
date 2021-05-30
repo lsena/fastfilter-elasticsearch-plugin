@@ -27,6 +27,9 @@ tasks.withType(JavaCompile) {
     options.compilerArgs << "-Xlint:unchecked,deprecation"
 }
 
+// This plugin only has yaml rest tests
+test.enabled = false
+
 esplugin {
   name pluginName
   description pluginDescription
