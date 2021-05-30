@@ -28,7 +28,7 @@ jobs:
         uses: "eskatos/gradle-command-action@v1"
         with:
           gradle-version: "${{ env.gradle-version }}"
-          arguments: "build"
+          arguments: "build --stacktrace"
       - name: "GitHub release"
         if: "contains('refs/heads/master refs/heads/6.x', github.ref)"
         run: |
