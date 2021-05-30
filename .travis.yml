@@ -18,4 +18,4 @@ before_install:
   - java -version
 
 script:
-  - gradle ':yamlRestTest' --tests "org.elasticsearch.lsena.fastfilter.FastFilterClientYamlTestSuiteIT.test {yaml=fastfilter/*}"
+  - gradle --debug ':yamlRestTest' --tests "org.elasticsearch.lsena.fastfilter.FastFilterClientYamlTestSuiteIT.test {yaml=fastfilter/*}"
