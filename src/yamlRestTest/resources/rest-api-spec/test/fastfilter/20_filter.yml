@@ -21,6 +21,16 @@ setup:
           index:  test
           id:     40
           body:   { "important_field": "foo foo", "filter_id": 40 }
+  - do:
+        index:
+          index:  test
+          id:     41
+          body:   { "important_field": "not that important", "filter_id": 41 }
+  - do:
+        index:
+          index:  test
+          id:     42
+          body:   { "important_field": "even less important!", "filter_id": 42 }
 
   - do:
       indices.refresh: {}
@@ -32,23 +42,20 @@ setup:
         index: test
         body:
           query:
-            function_score:
-              min_score: 0.00001
-              query:
-                match:
-                  important_field: "foo"
-              functions:
-                - script_score:
-                    script:
+            bool:
+              filter:
+                script:
+                  script:
                       source: "fast_filter"
                       lang: "fast_filter"
                       params:
                         operation: "exclude"
                         field: "filter_id"
                         terms: "OjAAAAEAAAAAAAIAEAAAAAoAFAAjAA=="
-
-  - length: { hits.hits: 1 }
+  - length: { hits.hits: 3 }
   - match: {hits.hits.0._id: "40" }
+  - match: {hits.hits.1._id: "41" }
+  - match: {hits.hits.2._id: "42" }
 ---
 "document filtering include":
   - do:
@@ -57,21 +64,63 @@ setup:
         index: test
         body:
           query:
-            function_score:
-              min_score: 0.00001
-              query:
-                match:
-                  important_field: "foo"
-              functions:
-                - script_score:
-                    script:
+            bool:
+              filter:
+                script:
+                  script:
                       source: "fast_filter"
                       lang: "fast_filter"
                       params:
                         operation: "include"
                         field: "filter_id"
                         terms: "OjAAAAEAAAAAAAIAEAAAAAoAFAAjAA=="
-
+  - length: { hits.hits: 2 }
+  - match: {hits.hits.0._id: "10" }
+  - match: {hits.hits.1._id: "20" }
+---
+"document filtering exclude with match":
+  - do:
+      search:
+        rest_total_hits_as_int: true
+        index: test
+        body:
+          query:
+            bool:
+              must:
+                - match:
+                    important_field: "foo"
+              filter:
+                script:
+                  script:
+                      source: "fast_filter"
+                      lang: "fast_filter"
+                      params:
+                        operation: "exclude"
+                        field: "filter_id"
+                        terms: "OjAAAAEAAAAAAAIAEAAAAAoAFAAjAA=="
+  - length: { hits.hits: 1 }
+  - match: {hits.hits.0._id: "40" }
+---
+"document filtering include with match":
+  - do:
+      search:
+        rest_total_hits_as_int: true
+        index: test
+        body:
+          query:
+            bool:
+              must:
+                - match:
+                    important_field: "foo"
+              filter:
+                script:
+                  script:
+                      source: "fast_filter"
+                      lang: "fast_filter"
+                      params:
+                        operation: "include"
+                        field: "filter_id"
+                        terms: "OjAAAAEAAAAAAAIAEAAAAAoAFAAjAA=="
   - length: { hits.hits: 2 }
   - match: {hits.hits.0._id: "20" }
   - match: {hits.hits.1._id: "10" }
@@ -87,7 +136,6 @@ setup:
               query:
                 match:
                   important_field: "foo"
-
   - length: { hits.hits: 3 }
   - match: {hits.hits.0._id: "20" }
   - match: {hits.hits.1._id: "40" }
