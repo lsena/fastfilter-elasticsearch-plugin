@@ -28,14 +28,12 @@ import org.elasticsearch.script.FilterScript;
 import org.elasticsearch.script.FilterScript.LeafFactory;
 import org.elasticsearch.script.ScriptContext;
 import org.elasticsearch.script.ScriptEngine;
-import org.elasticsearch.script.ScriptFactory;
 import org.elasticsearch.search.lookup.SearchLookup;
 import org.elasticsearch.index.fielddata.ScriptDocValues;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 
 import java.util.Base64;
 import java.nio.ByteBuffer;
@@ -90,20 +88,7 @@ public class FastFilterPlugin extends Plugin implements ScriptPlugin {
 			// optionally close resources
 		}
 
-		@Override
-		public Set<ScriptContext<?>> getSupportedContexts() {
-			return this.getSupportedContexts();
-			//return Set.of(ScoreScript.CONTEXT);
-		}
-
-		private static class FastFilterFactory implements FilterScript.Factory,
-		ScriptFactory {
-			@Override
-			public boolean isResultDeterministic() {
-				// FastFilterLeafFactory only uses deterministic APIs, this
-				// implies the results are cacheable.
-				return true;
-			}
+		private static class FastFilterFactory implements FilterScript.Factory {
 
 			@Override
 			public LeafFactory newFactory(
