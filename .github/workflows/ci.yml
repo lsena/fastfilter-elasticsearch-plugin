@@ -27,6 +27,7 @@ jobs:
       - name: "Gradle build"
         uses: "eskatos/gradle-command-action@v1"
         with:
+          java-version: "${{ env.java-version }}"
           gradle-version: "${{ env.gradle-version }}"
           arguments: "build --stacktrace"
       - name: The job has failed
