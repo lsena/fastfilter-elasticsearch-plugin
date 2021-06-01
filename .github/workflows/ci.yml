@@ -12,7 +12,7 @@ on:
 
 env:
   gradle-version: "6.8.3"
-  java-version: "11"
+  java-version: "14"
 
 jobs:
   build:
