@@ -31,11 +31,11 @@ tasks.withType(JavaCompile) {
 test.enabled = false
 
 esplugin {
-  name pluginName
-  description pluginDescription
-  classname pluginClassname
-  licenseFile rootProject.file("LICENSE.txt")
-  noticeFile rootProject.file("NOTICE.txt")
+    name pluginName
+    description pluginDescription
+    classname pluginClassname
+    licenseFile rootProject.file("LICENSE.txt")
+    noticeFile rootProject.file("NOTICE.txt")
 
 }
 
@@ -46,9 +46,13 @@ allprojects {
 }
 
 dependencies {
-	implementation 'org.roaringbitmap:RoaringBitmap:0.9.10'
+    implementation 'org.roaringbitmap:RoaringBitmap:0.9.10'
 
-  yamlRestTestImplementation "org.apache.logging.log4j:log4j-core:2.11.1"
+    yamlRestTestImplementation "org.apache.logging.log4j:log4j-core:2.11.1"
+}
+
+testClusters.all {
+    numberOfNodes = 2
 }
 
 validateNebulaPom.enabled = false
