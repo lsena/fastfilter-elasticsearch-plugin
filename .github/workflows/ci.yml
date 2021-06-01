@@ -12,7 +12,7 @@ on:
 
 env:
   gradle-version: "6.8.3"
-  java-version: "11"
+  java-version: "14"
 
 jobs:
   build:
@@ -28,7 +28,10 @@ jobs:
         uses: "eskatos/gradle-command-action@v1"
         with:
           gradle-version: "${{ env.gradle-version }}"
-          arguments: "build --stacktrace -x yamlRestTest"
+          arguments: "clean build --stacktrace"
+      - name: The job has failed
+        if: ${{ failure() }}
+        run: cat /home/runner/work/fastfilter-elasticsearch-plugin/fastfilter-elasticsearch-plugin/.gradle/reaper/*/*
       - name: "GitHub release"
         if: "contains('refs/heads/master refs/heads/6.x', github.ref)"
         run: |
