@@ -31,7 +31,7 @@ jobs:
           arguments: "build --stacktrace"
       - name: The job has failed
         if: ${{ failure() }}
-        run: echo ::set-output name=version::$(cat /home/runner/work/fastfilter-elasticsearch-plugin/fastfilter-elasticsearch-plugin/.gradle/reaper/*/*)
+        run: echo ::cat /home/runner/work/fastfilter-elasticsearch-plugin/fastfilter-elasticsearch-plugin/.gradle/reaper/*/*
       - name: "GitHub release"
         if: "contains('refs/heads/master refs/heads/6.x', github.ref)"
         run: |
