@@ -110,7 +110,17 @@ public class FastFilterPlugin extends Plugin implements ScriptPlugin {
 					Map<String, Object> params,
 					SearchLookup lookup
 					) {
-				return new FastFilterLeafFactory(params, lookup);
+				final byte[] decodedTerms = Base64.getDecoder().decode(params.get("terms").toString());
+				final ByteBuffer buffer = ByteBuffer.wrap(decodedTerms);
+				RoaringBitmap rBitmap = new RoaringBitmap();
+				try {
+					rBitmap.deserialize(buffer);
+				}
+				catch (IOException e) {
+					// Do something here
+				}
+				// FastFilterLeafFactory leafFactory = new FastFilterLeafFactory(params, lookup, rBitmap);
+				return new FastFilterLeafFactory(params, lookup, rBitmap);
 			}
 		}
 
@@ -120,9 +130,9 @@ public class FastFilterPlugin extends Plugin implements ScriptPlugin {
 			private final String fieldName;
 			private final String opType;
 			private final String terms;
+			private final RoaringBitmap rBitmap;
 
-			private FastFilterLeafFactory(
-					Map<String, Object> params, SearchLookup lookup) {
+			private FastFilterLeafFactory(Map<String, Object> params, SearchLookup lookup, RoaringBitmap rBitmap) {
 				if (params.containsKey("field") == false) {
 					throw new IllegalArgumentException(
 							"Missing parameter [field]");
@@ -133,6 +143,7 @@ public class FastFilterPlugin extends Plugin implements ScriptPlugin {
 				}
 				this.params = params;
 				this.lookup = lookup;
+				this.rBitmap = rBitmap;
 				opType = params.get("operation").toString();
 				fieldName = params.get("field").toString();
 				terms = params.get("terms").toString();
@@ -141,11 +152,6 @@ public class FastFilterPlugin extends Plugin implements ScriptPlugin {
 
 			@Override
 			public FilterScript newInstance(LeafReaderContext context) throws IOException {
-				final byte[] decodedTerms = Base64.getDecoder().decode(terms);
-				final ByteBuffer buffer = ByteBuffer.wrap(decodedTerms);
-				RoaringBitmap rBitmap = new RoaringBitmap();
-				rBitmap.deserialize(buffer);
-
 				return new FilterScript(params, lookup, context) {
 
 					@Override
