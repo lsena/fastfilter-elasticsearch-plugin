@@ -7,20 +7,22 @@
  */
 
 buildscript {
-  ext {
-    es_version = version.replaceAll(/\.[0-9]+$/, "")
-  }
-  repositories {
-    mavenCentral()
-    jcenter()
-  }
-  
-  dependencies {
-    classpath "org.elasticsearch.gradle:build-tools:${es_version}"
-  }
+    ext {
+        es_version = version.replaceAll(/\.[0-9]+$/, "")
+    }
+    repositories {
+        maven {
+            url = 'https://snapshots.elastic.co/maven/'
+        }
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.elasticsearch.gradle:build-tools:${es_version}"
+    }
 }
 
-apply plugin: "elasticsearch.esplugin"
+apply plugin: 'java'
+apply plugin: 'elasticsearch.esplugin'
 apply plugin: 'elasticsearch.yaml-rest-test'
 
 tasks.withType(JavaCompile) {
@@ -46,19 +48,8 @@ allprojects {
 }
 
 dependencies {
-    implementation 'org.roaringbitmap:RoaringBitmap:0.9.10'
+    implementation 'org.roaringbitmap:RoaringBitmap:0.9.35'
 
-    yamlRestTestImplementation "org.apache.logging.log4j:log4j-core:2.11.1"
+    yamlRestTestImplementation "org.apache.logging.log4j:log4j-core:2.17.0"
+    yamlRestTestImplementation "org.elasticsearch.test:framework:$es_version"
 }
-
-testClusters.all {
-    numberOfNodes = 2
-}
-
-validateNebulaPom.enabled = false
-
-forbiddenPatterns.enabled = false
-loggerUsageCheck.enabled = false
-testingConventions.enabled = false
-thirdPartyAudit.enabled = false
-
